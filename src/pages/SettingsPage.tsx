@@ -29,7 +29,12 @@ const SettingsPage: React.FC = () => {
   const handleThemeToggle = () => {
     setDarkMode((prev) => {
       const next = !prev;
+      
+      // Update the DOM
       document.documentElement.classList.toggle("dark", next);
+      
+      // Save preference to localStorage
+      localStorage.setItem('theme', next ? 'dark' : 'light');
       
       // Show toast notification
       toast({

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { useGoals } from '@/contexts/GoalContext';
@@ -17,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { QuickGoalLogModal } from "@/components/QuickGoalLogModal";
 
 const GoalsPage = () => {
   const { goals, isLoading, getProgressForGoal } = useGoals();
@@ -24,7 +24,11 @@ const GoalsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'streak' | 'name'>('streak');
-  
+
+  // Quick Log modal state
+  const [quickLogGoal, setQuickLogGoal] = useState<null | Goal>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
   // Filter and sort goals
   const filteredGoals = goals
     .filter(goal => {
@@ -40,7 +44,7 @@ const GoalsPage = () => {
         return a.name.localeCompare(b.name);
       }
     });
-  
+
   const getGoalIcon = (type: GoalType) => {
     switch (type) {
       case 'github':
@@ -57,15 +61,27 @@ const GoalsPage = () => {
   const handleStreakCardClick = (goalId: string) => {
     navigate(`/goals/${goalId}`);
   };
-  
+
+  const handleQuickLogClick = (goal: Goal) => {
+    setQuickLogGoal(goal);
+    setModalOpen(true);
+  };
+
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedType(null);
     setSortBy('streak');
   };
-  
+
   return (
     <Layout>
+      {/* Quick log modal for the selected goal */}
+      <QuickGoalLogModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        goal={quickLogGoal}
+      />
+
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Goals</h1>
@@ -146,12 +162,25 @@ const GoalsPage = () => {
                 <div className="col-span-full text-center py-8">Loading goals...</div>
               ) : filteredGoals.length > 0 ? (
                 filteredGoals.map(goal => (
-                  <StreakCard 
-                    key={goal.id} 
-                    goal={goal} 
-                    progress={75} // Mocked progress value
-                    onClick={() => handleStreakCardClick(goal.id)}
-                  />
+                  <div key={goal.id} className="relative group">
+                    <StreakCard 
+                      goal={goal} 
+                      progress={75} // Mocked progress value
+                      onClick={() => handleStreakCardClick(goal.id)}
+                    />
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-3 right-3 opacity-90 group-hover:opacity-100 transition-all"
+                      onClick={e => {
+                        e.stopPropagation();
+                        handleQuickLogClick(goal);
+                      }}
+                    >
+                      Log&nbsp;
+                      <span className="sr-only">Log quick progress for {goal.name}</span>
+                    </Button>
+                  </div>
                 ))
               ) : (
                 <div className="col-span-full text-center py-8">

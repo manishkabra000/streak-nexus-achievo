@@ -9,8 +9,8 @@ import { AchievementCard } from '@/components/AchievementCard';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Trophy, BarChart2, Github, Code } from 'lucide-react';
+import { PomodoroTimer } from "@/components/PomodoroTimer";
 
-// Landing page for unauthenticated users - Extracted as a separate component that doesn't use useAuth
 const LandingPage = () => {
   const navigate = useNavigate();
   
@@ -111,7 +111,6 @@ const LandingPage = () => {
   );
 };
 
-// Dashboard component for authenticated users
 const Dashboard = () => {
   const { goals, isLoading: goalsLoading } = useGoals();
   const { achievements, isLoading: achievementsLoading } = useAchievements();
@@ -125,11 +124,11 @@ const Dashboard = () => {
     navigate('/goals/new');
   };
 
-  // Only show unlocked achievements from user data
   const unlockedAchievements = achievements.filter(a => a.unlocked);
 
   return (
     <Layout>
+      <PomodoroTimer />
       <div className="space-y-8">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -139,10 +138,8 @@ const Dashboard = () => {
           </Button>
         </div>
 
-        {/* Dashboard Summary */}
         <DashboardSummary goals={goals} />
 
-        {/* Current Streaks */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Current Streaks</h2>
@@ -169,7 +166,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Recent Achievements */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Recent Achievements</h2>
@@ -191,11 +187,9 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Platform Stats Preview */}
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold">Platform Statistics</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* GitHub Stats */}
             <div className="bg-card rounded-lg p-4 border border-border">
               <div className="flex items-center mb-4">
                 <Github className="h-5 w-5 mr-2" />
@@ -216,7 +210,6 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-            {/* LeetCode Stats */}
             <div className="bg-card rounded-lg p-4 border border-border">
               <div className="flex items-center mb-4">
                 <Code className="h-5 w-5 mr-2" />
@@ -251,7 +244,6 @@ const Index = () => {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
-  // Render the appropriate component based on authentication status
   return isAuthenticated ? <Dashboard /> : <LandingPage />;
 };
 

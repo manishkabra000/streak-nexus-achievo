@@ -11,6 +11,9 @@ import { AchievementProvider } from "./contexts/AchievementContext";
 // Pages
 import Index from "./pages/Index";
 import GoalsPage from "./pages/GoalsPage";
+import GoalDetailPage from "./pages/GoalDetailPage";
+import NewGoalPage from "./pages/NewGoalPage";
+import EditGoalPage from "./pages/EditGoalPage";
 import AchievementsPage from "./pages/AchievementsPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -30,6 +33,9 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/goals" element={<GoalsPage />} />
+                <Route path="/goals/:id" element={<GoalDetailPage />} />
+                <Route path="/goals/new" element={<NewGoalPage />} />
+                <Route path="/goals/:id/edit" element={<EditGoalPage />} />
                 <Route path="/achievements" element={<AchievementsPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />

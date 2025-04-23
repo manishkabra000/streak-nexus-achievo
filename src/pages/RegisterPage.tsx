@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Github, ArrowLeft } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const RegisterPage = () => {
   const [name, setName] = useState('');
@@ -25,6 +26,7 @@ const RegisterPage = () => {
   const [error, setError] = useState<string | null>(null);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,10 +46,29 @@ const RegisterPage = () => {
     
     try {
       await register(email, password, name);
-      navigate('/');
-    } catch (err) {
+      toast({
+        title: "Registration successful!",
+        description: "Please check your email for verification instructions.",
+      });
+      navigate('/login');
+    } catch (err: any) {
       console.error('Registration failed:', err);
-      setError('Registration failed. Please try again.');
+      
+      // Handle specific error cases
+      if (err.message?.includes('email')) {
+        setError('Invalid email format. Please check your email address.');
+      } else if (err.message?.includes('already registered')) {
+        setError('This email is already registered. Please try logging in instead.');
+        toast({
+          title: "Account exists",
+          description: "This email is already registered. Try logging in instead.",
+          variant: "destructive",
+        });
+      } else if (err.message?.includes('password')) {
+        setError('Password is too weak. Please use at least 8 characters with numbers and letters.');
+      } else {
+        setError('Registration failed. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }

@@ -20,7 +20,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const mapSupabaseUser = (supabaseUser: SupabaseUser | null, integrationsObj: Record<string, boolean> | null = null): User | null => {
   if (!supabaseUser) return null;
-  return {
+  
+  // Create our application User object from the Supabase user
+  const appUser: User = {
     id: supabaseUser.id,
     name: supabaseUser.user_metadata?.name || supabaseUser.email || 'User',
     email: supabaseUser.email || '',
@@ -31,6 +33,8 @@ const mapSupabaseUser = (supabaseUser: SupabaseUser | null, integrationsObj: Rec
       leetcode: integrationsObj?.leetcode || false,
     }
   };
+  
+  return appUser;
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -155,14 +159,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ])
       .select();
     await fetchIntegrations(user.id);
-    setUser(mapSupabaseUser({ ...user }, { ...integrations, leetcode: !error }));
+    
+    // Update local user state with the new integration
+    const updatedIntegrations = { ...integrations, leetcode: !error };
+    setUser({
+      ...user,
+      integrations: updatedIntegrations
+    });
+    
     setIsLoading(false);
   };
 
   const refetchIntegrations = async () => {
     if (!user) return;
     const result = await fetchIntegrations(user.id);
-    setUser(mapSupabaseUser({ ...user }, result));
+    
+    // Update local user state with the refreshed integrations
+    setUser({
+      ...user,
+      integrations: result
+    });
   };
 
   return (

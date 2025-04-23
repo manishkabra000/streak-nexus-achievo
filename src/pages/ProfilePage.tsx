@@ -7,7 +7,7 @@ import { Github, Code, Mail, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const ProfilePage: React.FC = () => {
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout, connectLeetCode, refetchIntegrations } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,6 +27,11 @@ const ProfilePage: React.FC = () => {
   if (!user) {
     return null;
   }
+
+  const handleConnectLeetCode = async () => {
+    await connectLeetCode();
+    await refetchIntegrations();
+  };
 
   return (
     <div className="max-w-xl mx-auto mt-8">
@@ -53,16 +58,27 @@ const ProfilePage: React.FC = () => {
             <div className="flex items-center gap-2 mb-2">
               <Github size={20} className="text-muted-foreground" />
               <span>GitHub:</span>
-              <span className={`ml-2 font-medium ${user.integrations.github ? 'text-green-600' : 'text-red-600'}`}>
-                {user.integrations.github ? "Connected" : "Not Connected"}
+              <span className="ml-2 font-medium text-red-600">
+                Not Connected
               </span>
             </div>
             <div className="flex items-center gap-2 mb-2">
               <Code size={20} className="text-muted-foreground" />
               <span>LeetCode:</span>
-              <span className={`ml-2 font-medium ${user.integrations.leetcode ? 'text-green-600' : 'text-red-600'}`}>
-                {user.integrations.leetcode ? "Connected" : "Not Connected"}
-              </span>
+              {user.integrations.leetcode ? (
+                <span className="ml-2 font-medium text-green-600">
+                  Connected
+                </span>
+              ) : (
+                <Button 
+                  size="sm"
+                  className="ml-2"
+                  variant="outline"
+                  onClick={handleConnectLeetCode}
+                >
+                  Connect
+                </Button>
+              )}
             </div>
           </div>
           <Button variant="outline" onClick={logout}>

@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User as SupabaseUser, Session } from '@supabase/supabase-js';
@@ -11,14 +12,14 @@ interface AuthContextType {
   logout: () => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   connectGitHub: () => Promise<void>;
-  connectLeetCode: () => Promise<void>;
+  connectLeetCode: (externalUsername?: string) => Promise<void>;
+  refetchIntegrations: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const mapSupabaseUser = (supabaseUser: SupabaseUser | null): User | null => {
+const mapSupabaseUser = (supabaseUser: SupabaseUser | null, integrationsObj: Record<string, boolean> | null = null): User | null => {
   if (!supabaseUser) return null;
-  // Minimal mapping, since we don't have profiles table
   return {
     id: supabaseUser.id,
     name: supabaseUser.user_metadata?.name || supabaseUser.email || 'User',
@@ -26,8 +27,8 @@ const mapSupabaseUser = (supabaseUser: SupabaseUser | null): User | null => {
     avatar: supabaseUser.user_metadata?.avatar_url || '/placeholder.svg',
     created_at: supabaseUser.created_at || '',
     integrations: {
-      github: false,
-      leetcode: false
+      github: integrationsObj?.github || false,
+      leetcode: integrationsObj?.leetcode || false,
     }
   };
 };
@@ -37,22 +38,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [session, setSession] = useState<Session | null>(null);
 
+  // Integration state, so new connections appear immediately
+  const [integrations, setIntegrations] = useState<{ [provider: string]: boolean }>({});
+
+  const fetchIntegrations = async (userId: string) => {
+    // Get user's connected integrations from DB
+    const { data, error } = await supabase
+      .from('user_integrations')
+      .select('provider')
+      .eq('user_id', userId);
+
+    if (error) {
+      setIntegrations({});
+      return {};
+    }
+    const result: { [key: string]: boolean } = {};
+    data?.forEach(row => {
+      result[row.provider] = true;
+    });
+    setIntegrations(result);
+    return result;
+  };
+
   useEffect(() => {
-    // Establish auth state listener before fetching current session
+    // RLS: All state via supabase only
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      setUser(mapSupabaseUser(session?.user ?? null));
+      if (session?.user) {
+        fetchIntegrations(session.user.id).then(result => {
+          setUser(mapSupabaseUser(session.user, result));
+        });
+      } else {
+        setUser(null);
+        setIntegrations({});
+      }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setUser(mapSupabaseUser(session?.user ?? null));
+      if (session?.user) {
+        fetchIntegrations(session.user.id).then(result => {
+          setUser(mapSupabaseUser(session.user, result));
+        });
+      } else {
+        setUser(null);
+      }
       setIsLoading(false);
     });
 
     return () => {
       listener.subscription.unsubscribe();
     };
+    // eslint-disable-next-line
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -63,7 +100,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error(error.message || 'Invalid credentials');
     }
     setSession(data.session || null);
-    setUser(mapSupabaseUser(data.user || null));
+    const integrations = await fetchIntegrations(data.user?.id || '');
+    setUser(mapSupabaseUser(data.user || null, integrations));
     setIsLoading(false);
   };
 
@@ -84,7 +122,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error(error.message || 'Registration failed');
     }
     setSession(data.session || null);
-    setUser(mapSupabaseUser(data.user || null));
+    const integrations = await fetchIntegrations(data.user?.id || '');
+    setUser(mapSupabaseUser(data.user || null, integrations));
     setIsLoading(false);
   };
 
@@ -93,12 +132,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
     setSession(null);
     setUser(null);
+    setIntegrations({});
     setIsLoading(false);
   };
 
-  // Your existing logic for connectGitHub, connectLeetCode (demo only)
+  // Demo only - no real GitHub connection
   const connectGitHub = async () => {};
-  const connectLeetCode = async () => {};
+
+  // Actual connection to LeetCode
+  const connectLeetCode = async (externalUsername?: string) => {
+    if (!user) return;
+    setIsLoading(true);
+    // Insert integration row for current user
+    const { data, error } = await supabase
+      .from('user_integrations')
+      .insert([
+        {
+          provider: 'leetcode',
+          user_id: user.id,
+          external_username: externalUsername || null,
+        }
+      ])
+      .select();
+    await fetchIntegrations(user.id);
+    setUser(mapSupabaseUser({ ...user }, { ...integrations, leetcode: !error }));
+    setIsLoading(false);
+  };
+
+  const refetchIntegrations = async () => {
+    if (!user) return;
+    const result = await fetchIntegrations(user.id);
+    setUser(mapSupabaseUser({ ...user }, result));
+  };
 
   return (
     <AuthContext.Provider
@@ -111,6 +176,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         connectGitHub,
         connectLeetCode,
+        refetchIntegrations,
       }}
     >
       {children}

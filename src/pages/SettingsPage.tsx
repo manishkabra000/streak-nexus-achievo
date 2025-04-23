@@ -9,40 +9,40 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
 const SettingsPage: React.FC = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, connectLeetCode, refetchIntegrations } = useAuth();
   const { toast } = useToast();
 
   // For demo, these settings are static - add real logic as needed
   const [notifications, setNotifications] = React.useState(true);
   const [darkMode, setDarkMode] = React.useState(() => {
-    // Check if dark mode class is present on html element
     return document.documentElement.classList.contains("dark");
   });
 
-  // Apply theme on component mount
   useEffect(() => {
-    // Ensure the class matches the state on initial load
     document.documentElement.classList.toggle("dark", darkMode);
   }, []);
 
-  // Toggle theme by toggling 'dark' class on html element
+  // Handle (mock) LeetCode connection
+  const handleConnectLeetCode = async () => {
+    await connectLeetCode();
+    await refetchIntegrations();
+    toast({
+      title: "LeetCode Connected!",
+      description: "Your LeetCode account has been linked.",
+      duration: 2000,
+    });
+  };
+
   const handleThemeToggle = () => {
     setDarkMode((prev) => {
       const next = !prev;
-      
-      // Update the DOM
       document.documentElement.classList.toggle("dark", next);
-      
-      // Save preference to localStorage
       localStorage.setItem('theme', next ? 'dark' : 'light');
-      
-      // Show toast notification
       toast({
         title: next ? "Dark mode enabled" : "Light mode enabled",
         description: "Your theme preference has been saved.",
         duration: 2000,
       });
-      
       return next;
     });
   };
@@ -85,11 +85,7 @@ const SettingsPage: React.FC = () => {
                 <Github className="text-muted-foreground" size={20} />
                 <span>GitHub</span>
               </div>
-              {user?.integrations.github ? (
-                <span className="text-green-600 font-semibold">Connected</span>
-              ) : (
-                <span className="text-red-600 font-medium">Not connected</span>
-              )}
+              <span className="text-red-600 font-medium">Not connected</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -99,7 +95,7 @@ const SettingsPage: React.FC = () => {
               {user?.integrations.leetcode ? (
                 <span className="text-green-600 font-semibold">Connected</span>
               ) : (
-                <span className="text-red-600 font-medium">Not connected</span>
+                <Button size="sm" onClick={handleConnectLeetCode} variant="outline">Connect</Button>
               )}
             </div>
           </CardContent>

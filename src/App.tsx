@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,15 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { GoalProvider } from "./contexts/GoalContext";
 import { AchievementProvider } from "./contexts/AchievementContext";
 import ProfilePage from "./pages/ProfilePage";
+import Index from "./pages/Index";
+import GoalsPage from "./pages/GoalsPage";
+import GoalDetailPage from "./pages/GoalDetailPage";
+import NewGoalPage from "./pages/NewGoalPage";
+import EditGoalPage from "./pages/EditGoalPage";
+import AchievementsPage from "./pages/AchievementsPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 

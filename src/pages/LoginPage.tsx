@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Github, ArrowLeft } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -22,6 +23,7 @@ const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,9 +39,20 @@ const LoginPage = () => {
     try {
       await login(email, password);
       navigate('/');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Login failed:', err);
-      setError('Invalid credentials. Please try again.');
+      
+      // Handle specific error cases
+      if (err.message?.includes('Email not confirmed')) {
+        setError('Please confirm your email address before logging in. Check your inbox for a verification email.');
+        toast({
+          title: "Email not verified",
+          description: "Please check your inbox for a verification link",
+          variant: "destructive",
+        });
+      } else {
+        setError('Invalid credentials. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }

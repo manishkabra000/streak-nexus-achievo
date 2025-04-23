@@ -143,7 +143,7 @@ const Index = () => {
   );
 };
 
-// Landing page for unauthenticated users
+// Landing page for unauthenticated users - Extracted as a separate component that doesn't use useAuth
 const LandingPage = () => {
   const navigate = useNavigate();
   

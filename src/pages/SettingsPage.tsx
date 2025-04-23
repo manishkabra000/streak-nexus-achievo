@@ -1,27 +1,43 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Github, Code, Settings2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 const SettingsPage: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { toast } = useToast();
 
   // For demo, these settings are static - add real logic as needed
   const [notifications, setNotifications] = React.useState(true);
   const [darkMode, setDarkMode] = React.useState(() => {
-    // Detect system theme, default to false (light)
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    // Check if dark mode class is present on html element
+    return document.documentElement.classList.contains("dark");
   });
+
+  // Apply theme on component mount
+  useEffect(() => {
+    // Ensure the class matches the state on initial load
+    document.documentElement.classList.toggle("dark", darkMode);
+  }, []);
 
   // Toggle theme by toggling 'dark' class on html element
   const handleThemeToggle = () => {
     setDarkMode((prev) => {
       const next = !prev;
       document.documentElement.classList.toggle("dark", next);
+      
+      // Show toast notification
+      toast({
+        title: next ? "Dark mode enabled" : "Light mode enabled",
+        description: "Your theme preference has been saved.",
+        duration: 2000,
+      });
+      
       return next;
     });
   };

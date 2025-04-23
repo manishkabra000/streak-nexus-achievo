@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,17 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { GoalProvider } from "./contexts/GoalContext";
 import { AchievementProvider } from "./contexts/AchievementContext";
-
-// Pages
-import Index from "./pages/Index";
-import GoalsPage from "./pages/GoalsPage";
-import GoalDetailPage from "./pages/GoalDetailPage";
-import NewGoalPage from "./pages/NewGoalPage";
-import EditGoalPage from "./pages/EditGoalPage";
-import AchievementsPage from "./pages/AchievementsPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import NotFound from "./pages/NotFound";
+import ProfilePage from "./pages/ProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -39,7 +28,7 @@ const App = () => (
                 <Route path="/achievements" element={<AchievementsPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

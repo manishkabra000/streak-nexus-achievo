@@ -95,7 +95,7 @@ const GoalsPage = () => {
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all-types">All Types</SelectItem>
               <SelectItem value="github">
                 <div className="flex items-center">
                   <Github className="mr-2 h-4 w-4" />

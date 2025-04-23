@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Flame, Award, Calendar, BarChart2 } from 'lucide-react';
@@ -9,6 +8,65 @@ interface DashboardSummaryProps {
 }
 
 export const DashboardSummary: React.FC<DashboardSummaryProps> = ({ goals }) => {
+  if (!goals || goals.length === 0) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in">
+        <Card className="border border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-muted-foreground">Longest Active Streak</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold text-muted-foreground">–</div>
+              <div className="bg-streak-primary/10 text-streak-primary p-2 rounded-full">
+                <Flame size={20} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-muted-foreground">Longest Ever Streak</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold text-muted-foreground">–</div>
+              <div className="bg-streak-success/10 text-streak-success p-2 rounded-full">
+                <Award size={20} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-muted-foreground">Active Goals</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold text-muted-foreground">–</div>
+              <div className="bg-streak-info/10 text-streak-info p-2 rounded-full">
+                <Calendar size={20} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border border-border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm text-muted-foreground">Completion Rate</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-2xl font-bold text-muted-foreground">–</div>
+              <div className="bg-streak-warning/10 text-streak-warning p-2 rounded-full">
+                <BarChart2 size={20} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   // Calculate longest active streak across all goals
   const longestActiveStreak = Math.max(...goals.map(goal => goal.current_streak), 0);
   

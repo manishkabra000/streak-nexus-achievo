@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Layout } from '@/components/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGoals } from '@/contexts/GoalContext';
@@ -10,25 +10,24 @@ import { AchievementCard } from '@/components/AchievementCard';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Trophy, BarChart2, Github, Code } from 'lucide-react';
-import { MOCK_DATA } from '@/types';
 
 const Index = () => {
-  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { goals, isLoading: goalsLoading } = useGoals();
   const { achievements, isLoading: achievementsLoading } = useAchievements();
   const navigate = useNavigate();
-  
+
   const isLoading = authLoading || goalsLoading || achievementsLoading;
-  
-  // Placeholder functions for demo purposes
+
   const handleStreakCardClick = (goalId: string) => {
     navigate(`/goals/${goalId}`);
   };
-  
+
   const handleAddGoalClick = () => {
     navigate('/goals/new');
   };
 
+  // Only show unlocked achievements from user data
   const unlockedAchievements = achievements.filter(a => a.unlocked);
 
   if (!isAuthenticated && !isLoading) {
@@ -46,8 +45,10 @@ const Index = () => {
           </Button>
         </div>
 
+        {/* Dashboard Summary */}
         <DashboardSummary goals={goals} />
 
+        {/* Current Streaks */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Current Streaks</h2>
@@ -56,19 +57,25 @@ const Index = () => {
               View All Goals
             </Button>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {goals.map(goal => (
-              <StreakCard 
-                key={goal.id} 
-                goal={goal} 
-                progress={75} // Mocked progress value
-                onClick={() => handleStreakCardClick(goal.id)}
-              />
-            ))}
-          </div>
+          {goals.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">
+              No goals yet. <Button variant="link" onClick={handleAddGoalClick}>Create your first goal</Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {goals.map(goal => (
+                <StreakCard 
+                  key={goal.id} 
+                  goal={goal} 
+                  progress={0} // No mock progress, real progress logic would be separate
+                  onClick={() => handleStreakCardClick(goal.id)}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
+        {/* Recent Achievements */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Recent Achievements</h2>
@@ -77,12 +84,17 @@ const Index = () => {
               View All
             </Button>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {unlockedAchievements.slice(0, 4).map(achievement => (
-              <AchievementCard key={achievement.id} achievement={achievement} />
-            ))}
-          </div>
+          {unlockedAchievements.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">
+              No achievements unlocked yet.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {unlockedAchievements.slice(0, 4).map(achievement => (
+                <AchievementCard key={achievement.id} achievement={achievement} />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Platform Stats Preview */}
@@ -98,19 +110,18 @@ const Index = () => {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span>Current Streak:</span>
-                  <span className="font-bold">{MOCK_DATA.github_stats.current_streak} days</span>
+                  <span className="font-bold text-muted-foreground">–</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Total Contributions:</span>
-                  <span className="font-bold">{MOCK_DATA.github_stats.total_contributions}</span>
+                  <span className="font-bold text-muted-foreground">–</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Longest Streak:</span>
-                  <span className="font-bold">{MOCK_DATA.github_stats.longest_streak} days</span>
+                  <span className="font-bold text-muted-foreground">–</span>
                 </div>
               </div>
             </div>
-
             {/* LeetCode Stats */}
             <div className="bg-card rounded-lg p-4 border border-border">
               <div className="flex items-center mb-4">
@@ -120,19 +131,15 @@ const Index = () => {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span>Daily Streak:</span>
-                  <span className="font-bold">{MOCK_DATA.leetcode_stats.daily_streak} days</span>
+                  <span className="font-bold text-muted-foreground">–</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Problems Solved:</span>
-                  <span className="font-bold">{MOCK_DATA.leetcode_stats.solved_problems}</span>
+                  <span className="font-bold text-muted-foreground">–</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Difficulty Breakdown:</span>
-                  <span className="font-bold">
-                    <span className="text-green-500">{MOCK_DATA.leetcode_stats.easy_count}</span> / 
-                    <span className="text-yellow-500 ml-1">{MOCK_DATA.leetcode_stats.medium_count}</span> / 
-                    <span className="text-red-500 ml-1">{MOCK_DATA.leetcode_stats.hard_count}</span>
-                  </span>
+                  <span className="font-bold text-muted-foreground">–</span>
                 </div>
               </div>
             </div>
@@ -245,3 +252,4 @@ const LandingPage = () => {
 };
 
 export default Index;
+

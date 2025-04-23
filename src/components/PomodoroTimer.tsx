@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -6,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { useGoals } from "@/contexts/GoalContext";
 import { toast } from "sonner";
+import { SessionNotesDialog } from "@/components/SessionNotesDialog";
 
 export const PomodoroTimer: React.FC = () => {
   const { goals, trackProgress } = useGoals();
@@ -18,6 +18,10 @@ export const PomodoroTimer: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [showNotesDialog, setShowNotesDialog] = useState(false);
+  const [pendingNotes, setPendingNotes] = useState("");
+  const [progressDate, setProgressDate] = useState(""); // ISO date string for progress
+  const [notesLoading, setNotesLoading] = useState(false);
 
   // Reset timer when break toggled or sessionMinutes changes and not running
   useEffect(() => {
@@ -111,11 +115,28 @@ export const PomodoroTimer: React.FC = () => {
     if (selectedGoal?.tracking_unit === "duration") progressValue = sessionMinutes;
     if (selectedGoal?.tracking_unit === "count") progressValue = selectedGoal.target_value;
 
+    // Show notes dialog after session completes. We want to have the goal name
+    setProgressDate(today);
+    setPendingNotes(""); // Reset pending notes
+    setShowNotesDialog(true);
+    // Do NOT log progress here yet! Wait for user to save from popup.
+  };
+
+  const handleSaveSessionNotes = async (notes: string) => {
+    setNotesLoading(true);
     try {
-      await trackProgress(selectedGoalId, today, progressValue, "Auto-logged by Pomodoro Timer");
-      toast.success(`Pomodoro complete! Progress logged for "${selectedGoal?.name}".`);
+      await trackProgress(selectedGoalId, progressDate, 
+        goals.find(g => g.id === selectedGoalId)?.tracking_unit === "duration"
+          ? sessionMinutes
+          : goals.find(g => g.id === selectedGoalId)?.target_value ?? 1,
+        notes
+      );
+      toast.success("Progress and notes updated!");
+      setShowNotesDialog(false);
     } catch {
-      toast.error("Failed to log progress for this goal.");
+      toast.error("Failed to save notes. Please try again.");
+    } finally {
+      setNotesLoading(false);
     }
   };
 
@@ -187,6 +208,16 @@ export const PomodoroTimer: React.FC = () => {
           {isBreak ? "Break Time" : "Focus Session"}
         </div>
       </div>
+
+      {showNotesDialog && selectedGoalId && (
+        <SessionNotesDialog
+          open={showNotesDialog}
+          onOpenChange={open => setShowNotesDialog(open)}
+          goalName={goals.find(g => g.id === selectedGoalId)?.name ?? ""}
+          initialNotes={pendingNotes}
+          onSave={handleSaveSessionNotes}
+        />
+      )}
     </div>
   );
 };

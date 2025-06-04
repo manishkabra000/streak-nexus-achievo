@@ -1,73 +1,61 @@
-# Welcome to your Lovable project
+# Streak Nexus Achievo
 
-## Project info
+A modern web application built to streamline workflows, enhance productivity, and visualize achievements using the latest front-end technologies.
 
-**URL**: https://lovable.dev/projects/4385c6ae-c3fc-4b5f-b922-ce539623be33
+## Table of Contents
 
-## How can I edit this code?
+- [Project Info](#project-info)
+- [Project Description](#project-description)
+- [Screenshots](#screenshots)
+- [How Can I Edit This Code?](#how-can-i-edit-this-code)
+- [Technologies Used](#technologies-used)
+- [Deployment](#deployment)
+- [Custom Domain](#custom-domain)
+- [Contributing](#contributing)
+- [License](#license)
+- [Documentation](#documentation)
+- [Use Cases](#use-cases)
+- [Versioning](#versioning)
 
-There are several ways of editing your application.
+## Project Info
 
-**Use Lovable**
+**URL**: [https://lovable.dev/projects/4385c6ae-c3fc-4b5f-b922-ce539623be33](https://lovable.dev/projects/4385c6ae-c3fc-4b5f-b922-ce539623be33)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4385c6ae-c3fc-4b5f-b922-ce539623be33) and start prompting.
+## Project Description
 
+Streak Nexus Achievo helps individuals and teams automate daily tasks, collaborate efficiently, and track achievements through interactive dashboards and visualizations.
+
+## Screenshots
+
+<!-- Add actual screenshots or GIFs here -->
+![App Screenshot Placeholder](https://via.placeholder.com/800x400?text=App+Screenshot)
+
+## How Can I Edit This Code?
+
+There are several ways to edit your application:
+
+### 1. Use Lovable
+
+Simply visit the [Lovable Project](https://lovable.dev/projects/4385c6ae-c3fc-4b5f-b922-ce539623be33) and start prompting.  
 Changes made via Lovable will be committed automatically to this repo.
 
-**Use your preferred IDE**
+### 2. Use Your Preferred IDE
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Clone this repo locally and push changes. Pushed changes will also appear in Lovable.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+**Requirements:**  
+- Node.js & npm ([install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
 
-Follow these steps:
-
+**Steps:**
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Step 1: Clone the repository
+git clone https://github.com/manishkabra000/streak-nexus-achievo.git
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Step 2: Navigate to the project directory
+cd streak-nexus-achievo
 
-# Step 3: Install the necessary dependencies.
+# Step 3: Install dependencies
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Start the development server
 npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/4385c6ae-c3fc-4b5f-b922-ce539623be33) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
